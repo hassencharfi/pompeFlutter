@@ -1,13 +1,11 @@
-
- 
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
- import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
- import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pump_control/home_view.dart';
@@ -16,9 +14,10 @@ import 'package:pump_control/register_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-import 'dart:async'; 
+import 'dart:async';
 import 'bar.dart';
-import 'custom_appbar.dart'; 
+import 'custom_appbar.dart';
+
 class ProfileView extends StatefulWidget {
   const ProfileView({Key? key}) : super(key: key);
 
@@ -27,8 +26,10 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  final TextEditingController _currentPasswordController = TextEditingController(text:"");
-  final TextEditingController _newPasswordController = TextEditingController(text:""); 
+  final TextEditingController _currentPasswordController =
+      TextEditingController(text: "");
+  final TextEditingController _newPasswordController =
+      TextEditingController(text: "");
 
   double? _currentMaxTemperature;
   double? _currentMaxCurrent;
@@ -36,33 +37,36 @@ class _ProfileViewState extends State<ProfileView> {
   String? _userEmail;
   bool _obscureCurrentPassword = true;
   bool _obscureNewPassword = true;
-late Map<String, dynamic> _values = {}; 
+  late Map<String, dynamic> _values = {};
 
   late DatabaseReference _databaseReference;
   late StreamSubscription<DatabaseEvent> _databaseSubscription;
 
-late final TextEditingController _maxTemperatureController = TextEditingController(text: '');
-late final TextEditingController _maxCurrentController = TextEditingController(text: '');
+  late final TextEditingController _maxTemperatureController =
+      TextEditingController(text: '');
+  late final TextEditingController _maxCurrentController =
+      TextEditingController(text: '');
 
-@override
-void initState() {
-  super.initState();
-  _databaseReference = FirebaseDatabase.instance.reference().child('test');
-  _databaseSubscription = _databaseReference.onValue.listen((event) {
-    setState(() {
-      if (event.snapshot.value != null) {
-        _values = Map<String, dynamic>.from(event.snapshot.value! as Map);
+  @override
+  void initState() {
+    super.initState();
+    _databaseReference = FirebaseDatabase.instance.reference().child('test');
+    _databaseSubscription = _databaseReference.onValue.listen((event) {
+      setState(() {
+        if (event.snapshot.value != null) {
+          _values = Map<String, dynamic>.from(event.snapshot.value! as Map);
 
-        _currentMaxTemperature = _values['maxTemperature']?.toDouble() ?? 0.0;
-        _currentMaxCurrent = _values['maxCurrent']?.toDouble() ?? 0.0;
+          _currentMaxTemperature = _values['maxTemperature']?.toDouble() ?? 0.0;
+          _currentMaxCurrent = _values['maxCurrent']?.toDouble() ?? 0.0;
 
-        _maxTemperatureController.text = _currentMaxTemperature?.toString() ?? '';
-        _maxCurrentController.text = _currentMaxCurrent?.toString() ?? '';
-      }
+          _maxTemperatureController.text =
+              _currentMaxTemperature?.toString() ?? '';
+          _maxCurrentController.text = _currentMaxCurrent?.toString() ?? '';
+        }
+      });
     });
-  });
-  _loadUserInfo(); 
-}
+    _loadUserInfo();
+  }
 
   @override
   void dispose() {
@@ -78,14 +82,14 @@ void initState() {
       _userName = prefs.getString('name');
       _userEmail = prefs.getString('email');
     });
-  } 
-
+  }
 
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     await FirebaseAuth.instance.signOut();
-    Navigator.of(context).pushReplacementNamed('/login'); // Assuming you have a login route
+    Navigator.of(context)
+        .pushReplacementNamed('/login'); // Assuming you have a login route
   }
 
   @override
@@ -110,7 +114,7 @@ void initState() {
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                   child: Row(
-                    children: [ 
+                    children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -132,7 +136,9 @@ void initState() {
                   labelText: 'Current Password',
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureCurrentPassword ? Icons.visibility : Icons.visibility_off,
+                      _obscureCurrentPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                     onPressed: () {
                       setState(() {
@@ -149,7 +155,9 @@ void initState() {
                   labelText: 'New Password',
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureNewPassword ? Icons.visibility : Icons.visibility_off,
+                      _obscureNewPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                     onPressed: () {
                       setState(() {
@@ -168,7 +176,8 @@ void initState() {
                     child: Text('Change Password'),
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0), // Adjust the radius as needed
+                        borderRadius: BorderRadius.circular(
+                            20.0), // Adjust the radius as needed
                       ),
                     ),
                   ),
@@ -191,8 +200,10 @@ void initState() {
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
                     onPressed: () async {
-                      double maxTemperature = double.parse(_maxTemperatureController.text);
-                      double maxCurrent = double.parse(_maxCurrentController.text);
+                      double maxTemperature =
+                          double.parse(_maxTemperatureController.text);
+                      double maxCurrent =
+                          double.parse(_maxCurrentController.text);
                       await updateMaxValues(maxTemperature, maxCurrent);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Max values updated')),
@@ -201,7 +212,8 @@ void initState() {
                     child: Text('Update Max Values'),
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0), // Adjust the radius as needed
+                        borderRadius: BorderRadius.circular(
+                            20.0), // Adjust the radius as needed
                       ),
                     ),
                   ),
@@ -215,7 +227,8 @@ void initState() {
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0), // Adjust the radius as needed
+                      borderRadius: BorderRadius.circular(
+                          20.0), // Adjust the radius as needed
                     ),
                   ),
                 ),
@@ -236,7 +249,8 @@ void initState() {
         email: FirebaseAuth.instance.currentUser!.email!,
         password: currentPassword,
       );
-      await FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(credential);
+      await FirebaseAuth.instance.currentUser!
+          .reauthenticateWithCredential(credential);
 
       await FirebaseAuth.instance.currentUser!.updatePassword(newPassword);
       ScaffoldMessenger.of(context).showSnackBar(
