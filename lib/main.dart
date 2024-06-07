@@ -18,7 +18,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'dart:async';
 import 'bar.dart';
-import 'custom_appbar.dart';
 
 // ...
 String selectedDay = 'Monday'; // Default selected day
